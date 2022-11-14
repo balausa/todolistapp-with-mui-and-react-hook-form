@@ -11,7 +11,7 @@ const Snack = ({isOpen, handleClose=Function.prototype}) => {
         <Alert
         severity="success"
         >
-            Товар добавлен в корзину!
+            Создана новая задача!
         </Alert>
     </Snackbar>
   )

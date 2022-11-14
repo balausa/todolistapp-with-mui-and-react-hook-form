@@ -1,19 +1,10 @@
 import React from 'react';
-import { useState } from 'react';
 import { AppBar, IconButton, Toolbar, Typography,Badge } from '@mui/material';
 import { ShoppingBasket } from '@mui/icons-material';
 import Search from '../search/search';
 import SearchIcon from '@mui/icons-material/Search';
+
 function Header({ handleCart, orderLen, onChange }) {
-
-const [search, setSearch]= useState('');
-
-const onSearchChange=(e)=>{
-      const term = e.target.value;
-        setSearch(term);
-        onChange(term);
-  }
-
   return (
     <AppBar position="static">
         <Toolbar>
@@ -26,8 +17,7 @@ const onSearchChange=(e)=>{
             </Typography>   
             <SearchIcon />     
             <Search
-                    value={search}
-                    onChange={onSearchChange}
+                  onChange={onChange}
                 />                 
             <IconButton
               color="inherit"

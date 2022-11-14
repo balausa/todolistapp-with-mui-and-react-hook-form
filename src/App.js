@@ -31,20 +31,21 @@ const App = () => {
         }
         );
     
-    const onSubmit=(data)=>{    
-        const newItem = createItem(data);
-        console.log(newItem);
+    const onSubmit=(data)=>{
+        if(data.label.trim() ==='') return;
+        const newItem= createItem(data);
         setTodos([...todos,newItem])
-        reset();
-
+        reset();        
+        setSnackOpen(true);
     }
-
+    
     const createItem=(data)=> {
         return {
           id: todos.length+1,
           label: data.label,
           important: false,
-          done: false
+          done: false,
+          created: new Date()
         };
       }
 
@@ -68,8 +69,7 @@ const App = () => {
     const onImportant = (id) => {        
         const importantTodo = toggleProperty(todos, id, 'important');
         setTodos(importantTodo);
-    };
-  
+    };  
     
     const onDelete = (id) => {
         const idx = todos.findIndex((todo) => todo.id === id);
@@ -80,19 +80,28 @@ const App = () => {
           setTodos(remainingTodos);
     };
     
+    const onChangeLabel=(id,changedLabel)=>{
+        const idx = todos.findIndex((todo) => todo.id === id);
+        const currentTodo = todos.filter((item)=>item.id===id);
+        currentTodo[0].label = changedLabel;
+        const changedTodos = [
+            ...todos.slice(0, idx),
+            ...currentTodo,
+            ...todos.slice(idx + 1)
+          ];
+          setTodos(changedTodos);
+    }
+
     const handleChange = (todos,visibleTodos) => {
         if (visibleTodos.length === 0) {
          return todos;
         }
 
         return todos.filter((item) =>{
-              return item.label.indexOf(visibleTodos) > -1;
+              return item.label.toLowerCase().includes(visibleTodos.toLowerCase());
         });
-    };
-
+    };  
     
-    const visibleItems= handleChange(todos,visibleTodos);
-
     const onChange=(term)=>{
         setVisibleTodos(term);
     }
@@ -135,6 +144,8 @@ const App = () => {
         setOrder(order.filter((item) => item.id !== goodsItem));
     };      
   
+    const visibleItems= handleChange(todos,visibleTodos);
+
     return (
             <>
             <Header 
@@ -154,6 +165,10 @@ const App = () => {
             sx={{mb:'1.5rem', width: '25rem'}}
             {...register('label',
             {required:"Невозможно добавить пустой запись(Пожалуйста,заполните поле)",
+            minLength: {
+                value: 2,
+                message: 'Минимум 3 символа'
+            },
              maxLength:{
                 value: 32,
                 message:'Запись должна содержать максимум 32 символа'
@@ -163,17 +178,17 @@ const App = () => {
             <CheckCircleIcon color="primary" fontSize="large"/>                 
             </IconButton>             
             </form>
-            {errors?.label && 
-                      <>
+            {errors?.label && <>
                       <Alert severity="error">
                       <AlertTitle>{errors?.label.message || "Error!"}</AlertTitle>         
                       </Alert>   
-                      </>}
+                      </>}    
             <TodoList
                         items={ visibleItems }  
                         onChecked={onChecked}
                         onImportant={onImportant}
                         onDelete={onDelete} 
+                        onChangeLabel={onChangeLabel}
             />              
             </Container>
             <Basket 
