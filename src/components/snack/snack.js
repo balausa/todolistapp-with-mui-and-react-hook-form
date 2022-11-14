@@ -2,17 +2,33 @@ import { Snackbar,Alert } from '@mui/material'
 import React from 'react'
 
 const Snack = ({isOpen, handleClose=Function.prototype}) => {
+
+  const renderSwitch=(isOpen)=>{
+    switch(isOpen) {
+      case 'new':
+        return <Alert severity="success">
+        Создана новая задача!
+       </Alert> 
+      case 'delete':
+        return <Alert severity="info">
+        Задача удалена!
+       </Alert>;
+      case 'restore':
+        return <Alert severity="info">
+        Задача восстановлена!
+       </Alert>;
+      default:
+        break;       
+    }
+  }
+
   return (
     <Snackbar
-        open={isOpen}
+        open={!!isOpen}
         onClose={handleClose}
-        autoHideDuration={3000}
+        autoHideDuration={1500}
     >
-        <Alert
-        severity="success"
-        >
-         Создана новая задача!
-        </Alert>
+      { renderSwitch(isOpen)}
     </Snackbar>
   )
 }

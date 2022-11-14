@@ -15,7 +15,7 @@ const App = () => {
 
   const [isCartOpen, setCartOpen] = useState(false);
   const [order, setOrder] = useState([]);
-  const [isSnackOpen, setSnackOpen] = useState(false);
+  const [isSnackOpen, setSnackOpen] = useState('');
   const [todos, setTodos] = useState(items);
   const [visibleTodos, setVisibleTodos] = useState('');
   
@@ -36,7 +36,7 @@ const App = () => {
         const newItem= createItem(data);
         setTodos([...todos,newItem])
         reset();        
-        setSnackOpen(true);
+        setSnackOpen('new');
     }
     
     const createItem=(data)=> {
@@ -77,7 +77,8 @@ const App = () => {
             ...todos.slice(0, idx),
             ...todos.slice(idx + 1)
           ];
-          setTodos(remainingTodos);
+          setTodos(remainingTodos);          
+          setSnackOpen('delete');
           addToOrder(id);
     };
     
@@ -142,8 +143,7 @@ const App = () => {
                     },
                 ],
             );
-        }
-        setSnackOpen(true);         
+        }    
     };
 
     const removeFromOrder = (basketItem) => {   
@@ -154,9 +154,9 @@ const App = () => {
           ];
           setTodos(restoredTodos);
           setOrder(order.filter((item) => item.id !== basketItem));
+          setSnackOpen('restore');
     };      
 
-    console.log(todos);
     const visibleItems= handleChange(todos,visibleTodos);
 
     return (
@@ -172,7 +172,7 @@ const App = () => {
             <form
              onSubmit={handleSubmit(onSubmit)}>
             <TextField      
-            label="New entry"
+            label="Новая задача"
             variant="standard"                    
             type='search' 
             sx={{mb:'1.5rem', width: '25rem'}}
