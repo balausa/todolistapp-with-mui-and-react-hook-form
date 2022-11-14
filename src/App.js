@@ -2,18 +2,52 @@ import React  from 'react';
 import Header from './components/header/header';
 import Basket from './components/basket/basket';
 import Snack from './components/snack/snack'
+import IconButton from '@mui/material/IconButton';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { TextField } from "@mui/material";
+import { Alert, AlertTitle } from '@mui/material';
 import { items } from './components/data/data';
 import { Container } from '@mui/material';
 import TodoList from './components/todo-list/todo-list';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 const App = () => {
 
   const [isCartOpen, setCartOpen] = useState(false);
   const [order, setOrder] = useState([]);
-  const [search, setSearch] = useState('');
   const [isSnackOpen, setSnackOpen] = useState(false);
-  const [todos, setTodos] = useState(items);  
+  const [todos, setTodos] = useState(items);
+  const [visibleTodos, setVisibleTodos] = useState('');
   
+  const {
+        register, 
+        formState:{
+        errors, isValid
+        },
+        handleSubmit,
+        reset
+        } = useForm({
+        mode: "onBlur"
+        }
+        );
+    
+    const onSubmit=(data)=>{    
+        const newItem = createItem(data);
+        console.log(newItem);
+        setTodos([...todos,newItem])
+        reset();
+
+    }
+
+    const createItem=(data)=> {
+        return {
+          id: todos.length+1,
+          label: data.label,
+          important: false,
+          done: false
+        };
+      }
+
     const toggleProperty = (arr, id, propName) => {
         const idx = arr.findIndex((item) => item.id === id);
         const oldItem = arr[idx];
@@ -45,20 +79,23 @@ const App = () => {
           ];
           setTodos(remainingTodos);
     };
-
-    const handleChange = (e) => {
-        if (!e.target.value) {
-          setTodos(items);
-          setSearch('');
-          return;
+    
+    const handleChange = (todos,visibleTodos) => {
+        if (visibleTodos.length === 0) {
+         return todos;
         }
 
-        setSearch(e.target.value);
-        setTodos(todos.filter((item) =>
-              item.label.toLowerCase().includes(e.target.value.toLowerCase())
-        ));
+        return todos.filter((item) =>{
+              return item.label.indexOf(visibleTodos) > -1;
+        });
     };
 
+    
+    const visibleItems= handleChange(todos,visibleTodos);
+
+    const onChange=(term)=>{
+        setVisibleTodos(term);
+    }
     const addToOrder = (goodsItem) => {
         let quantity = 1;
         const indexInOrder = order.findIndex(
@@ -103,15 +140,37 @@ const App = () => {
             <Header 
                 handleCart={()=>setCartOpen(true)}
                 orderLen={order.length}
-                value={search}
-                onChange={handleChange}
+                onChange={onChange}
             />
             <Container
                 sx={{mt: '1rem'}}
             >
-          
+            <form
+             onSubmit={handleSubmit(onSubmit)}>
+            <TextField      
+            label="New entry"
+            variant="standard"                    
+            type='search' 
+            sx={{mb:'1.5rem', width: '25rem'}}
+            {...register('label',
+            {required:"Невозможно добавить пустой запись(Пожалуйста,заполните поле)",
+             maxLength:{
+                value: 32,
+                message:'Запись должна содержать максимум 32 символа'
+             }
+             })}/>
+            <IconButton sx={{ mt: 1, mr: 1 }} type="submit" variant="outlined" disabled={!isValid}>
+            <CheckCircleIcon color="primary" fontSize="large"/>                 
+            </IconButton>             
+            </form>
+            {errors?.label && 
+                      <>
+                      <Alert severity="error">
+                      <AlertTitle>{errors?.label.message || "Error!"}</AlertTitle>         
+                      </Alert>   
+                      </>}
             <TodoList
-                        items={ todos }  
+                        items={ visibleItems }  
                         onChecked={onChecked}
                         onImportant={onImportant}
                         onDelete={onDelete} 
