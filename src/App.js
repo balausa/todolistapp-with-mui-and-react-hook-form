@@ -78,6 +78,7 @@ const App = () => {
             ...todos.slice(idx + 1)
           ];
           setTodos(remainingTodos);
+          addToOrder(id);
     };
     
     const onChangeLabel=(id,changedLabel)=>{
@@ -105,22 +106,25 @@ const App = () => {
     const onChange=(term)=>{
         setVisibleTodos(term);
     }
-    const addToOrder = (goodsItem) => {
+    const addToOrder = (basket) => {
         let quantity = 1;
+        const idx = todos.findIndex((todo) => todo.id === basket);
         const indexInOrder = order.findIndex(
-            (item) => item.id === goodsItem.id
+            (item) => item.id === basket.id
         );
 
         if (indexInOrder > -1) {
             quantity = order[indexInOrder].quantity + 1;
 
             setOrder(order.map((item) => {
-                    if (item.id !== goodsItem.id) return item;
+                    if (item.id !== basket.id) return item;
 
                     return {
                         id: item.id,
-                        name: item.name,
-                        price: item.price,
+                        label: item.label,
+                        important: item.important,
+                        done: item.done,
+                        created: item.created,
                         quantity,
                     };
                 }),
@@ -129,21 +133,30 @@ const App = () => {
             setOrder([
                     ...order,
                     {
-                        id: goodsItem.id,
-                        name: goodsItem.name,
-                        price: goodsItem.price,
+                        id: todos[idx].id,
+                        label: todos[idx].label,
+                        important: todos[idx].important,
+                        done: todos[idx].done,
+                        created: todos[idx].created,
                         quantity,
                     },
                 ],
             );
         }
-        setSnackOpen(true); 
+        setSnackOpen(true);         
     };
 
-    const removeFromOrder = (goodsItem) => {   
-        setOrder(order.filter((item) => item.id !== goodsItem));
+    const removeFromOrder = (basketItem) => {   
+        const fromBasket = order.filter((item)=>item.id===basketItem);
+        const restoredTodos = [
+            ...todos,
+            ...fromBasket
+          ];
+          setTodos(restoredTodos);
+          setOrder(order.filter((item) => item.id !== basketItem));
     };      
-  
+
+    console.log(todos);
     const visibleItems= handleChange(todos,visibleTodos);
 
     return (

@@ -1,13 +1,19 @@
 import { Close } from "@mui/icons-material";
 import { IconButton, ListItem, Typography } from "@mui/material";
 
-const BasketItem = ({removeFromOrder,id,name,price,quantity}) => {
+const BasketItem = ({removeFromOrder,id,label,important,done,created,quantity}) => {
     return (
-        <ListItem>
+            <ListItem sx={{ bgcolor:'#FAFAD2'}}>
             <Typography
             variant="body1"
             >
-            {name} {price}руб x{quantity}
+            Задача: {label} 
+            <br/>
+            Создано:{created.toLocaleString()}
+            <br/>
+            Важность: { important ? 'Важно' : 'Не важно'} 
+            <br/>
+            Статус: { done ? 'Сделано' : 'Не сделано'}
             </Typography>
             <IconButton
                 onClick={() => removeFromOrder(id)}
@@ -15,6 +21,7 @@ const BasketItem = ({removeFromOrder,id,name,price,quantity}) => {
                <Close/>
             </IconButton>
         </ListItem>
+
     );
 };
 

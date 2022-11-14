@@ -8,7 +8,7 @@ import BasketItem from '../basket-item/basket-item';
         closeCart=Function.prototype,
         order=[], 
         removeFromOrder} = props;
-
+        
   return (
     <Drawer
     anchor="right"
@@ -25,7 +25,7 @@ import BasketItem from '../basket-item/basket-item';
             <ListItemText primary="Корзина"/>
         </ListItem>
         <Divider textAlign="center">
-            Список товаров
+            Удаленные задачи
         </Divider>
         {!order.length ? (
             <ListItem>
@@ -33,24 +33,22 @@ import BasketItem from '../basket-item/basket-item';
             </ListItem>
         ) : (
             <>
-            {order.map((item)=>(
+            {order.map((item)=>(                
                 <BasketItem 
-                    key={item.name} 
+                    key={item.id} 
                     removeFromOrder={removeFromOrder}
                     {...item}/>))}
         <Divider/>
         <ListItem>
             <Typography sx={{fontWeight:700}}>
-                Общая стоимость:{' '}
+                Общее количество:{' '}
                 {order.reduce((acc, item) => {
-                    return acc + item.price * item.quantity;
-                }, 0)}{' '}
-                рублей.
+                    return acc + item.quantity;
+                }, 0)}
             </Typography>
         </ListItem>
             </>
         )}
-
         </List>  
     </Drawer>
   )
